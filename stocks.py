@@ -56,14 +56,17 @@ def earnhist():
     global ticker
 
     for i in range(6):
-        ehist = json.dumps(get_earnings_history(ticker)[i], indent = 2)
-        ehist1 = ehist.replace('    ','').replace('  ','').replace('[', '').replace(']', '').replace('"', '').replace('{', '').replace('}', '').replace(',', '')
-        ehist2 = ehist1.splitlines()
-        while("" in ehist2):
-            ehist2.remove("")
-        ehist3 = str("\n".join(ehist2))
-        print("\n#%d\n" % i, ehist3)
-        i = i + 1
+        try:
+            ehist = json.dumps(get_earnings_history(ticker)[i], indent = 2)
+            ehist1 = ehist.replace('    ','').replace('  ','').replace('[', '').replace(']', '').replace('"', '').replace('{', '').replace('}', '').replace(',', '')
+            ehist2 = ehist1.splitlines()
+            while("" in ehist2):
+                ehist2.remove("")
+            ehist3 = str("\n".join(ehist2))
+            print("\n#%d\n" % i, ehist3)
+            i = i + 1
+        except IndexError:
+            pass
 
     input()
 
