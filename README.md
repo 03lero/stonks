@@ -1,5 +1,7 @@
 # stonks
 
 todo:
-daemonization (python-daemon)
-multiple ticker input
+
+- daemonization (python-daemon)
+
+- multiple ticker input
