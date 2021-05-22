@@ -34,7 +34,7 @@ class runui:
         psr = float(val[val.Attribute.str.contains("Price/Sales")].iloc[0,1])
         peg = float(val[val.Attribute.str.contains("PEG")].iloc[0,1])
         cprice = get_live_price(u.ticker)
-        print(qtab3, "\nTrailing P/E: %f\nPrice/Sales: %f\nPrice/Earnings-To-Growth: %f\nCurrent Price: $%d" % (per, psr, peg, cprice))
+        print(qtab3, "\nTrailing P/E: %f\nPrice/Sales: %f\nPrice/Earnings-To-Growth: %f\nCurrent Price: $%f" % (per, psr, peg, cprice))
         input()
 
     def earnhist(u):
