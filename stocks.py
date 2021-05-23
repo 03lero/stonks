@@ -1,4 +1,4 @@
-import socket, inspect, smtplib, ssl, json, getopt, sys, os
+import time, socket, inspect, smtplib, ssl, json, getopt, sys, os
 from yahoo_fin.stock_info import *
 from cursesmenu import *
 from cursesmenu.items import *
@@ -90,10 +90,8 @@ class daemon:
                 quit()
             elif opt in ("-t", "--ticker"):
                 u.ticker = arg
-                print(u.ticker)
             elif opt in ("-e", "--email"):
                 u.email = arg
-                print(u.email) 
         d.tickpick()
 
     def infograb(u):
@@ -104,7 +102,7 @@ class daemon:
         psr = float(val[val.Attribute.str.contains("Price/Sales")].iloc[0,1])
         peg = float(val[val.Attribute.str.contains("PEG")].iloc[0,1])
         u.cprice = get_live_price(u.ticker)
-        u.info = str("Price/Earnings Rato: %f | Price/Sales Ratio: %f | PEG: %f | Current Price: %f" % (per, psr, peg, u.cprice)) 
+        u.info = str("Price/Earnings Rato: %f\nPrice/Sales Ratio: %f\nPEG: %f\nCurrent Price: %f" % (per, psr, peg, u.cprice)) 
         u.pf.write(u.info)
 
     def tickpick(u):
@@ -115,7 +113,9 @@ class daemon:
         u.pf = open(u.pricefile, "w")
         d.infograb()
         d.smtpinit()  
-    
+
+###[ MAILER START ]###
+
     def smtpinit(u):
         if os.path.exists(u.smtpfile) == False:
             ans = input("Default SMTP File (smtp.txt in pystocks folder) could not be located.\nWould you like to select another?\n(Y)/(N)\n> ")
@@ -144,32 +144,33 @@ class daemon:
         while True:
             context = ssl.create_default_context()
             try:
-                with smtplib.SMTP_SSL(u.host, u.port, context=context) as server:
-                    server.login(u.user, u.psk)
-                #server = smtplib.SMTP(u.host, u.port)
-                #server.ehlo()
-                #server.starttls(context=context)
-                #server.ehlo()
-                #server.login(u.user, u.psk)
-                #u.server = server
+                server = smtplib.SMTP(u.host, u.port)
+                server.ehlo()
+                server.starttls(context=context)
+                server.login(u.user, u.psk)
+                u.server = server
                 print("Connected to SMTP Server")
                 break
             except ValueError:
                 print("Could not connect to SMTP Server.")
                 print("Error. Reconfigure SMTP Entries.")
                 quit()
+        d.send()
 
     def send(u):
         server = u.server
-        while True:
-            sleep(1800)
+        subject = str("PyStock Update for: %s" % u.ticker)
+        while True: 
+            print("30min timer initiated")
+            time.sleep(1800)
             oldprice = u.cprice
             d.infograb()
-            negch = (((u.cprice - oldprice) / oldprice) * 100)
+            negch = (((u.cprice - oldprice) / oldprice) * 100) 
             if negch < -5:
-                message = u.info + "\n" + str("Percent change: %f%" % abs(negch))
-                server.sendmail(u.user, u.email, message)
-
+                body = str(u.info + "\n" + "Percent change: %f%." % abs(negch))
+                message = f'Subject: {subject}\n\n{body}'
+                server.sendmail(u.user, u.email, message) 
+                print("Update email sent") 
 
 ###[ MAILER END ]###
 
