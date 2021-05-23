@@ -174,5 +174,7 @@ class daemon:
 
 ###[ MAILER END ]###
 
+###[ DAEMON END ]###
+
 d = daemon()
 d.arg(sys.argv[1:])
