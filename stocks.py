@@ -151,7 +151,7 @@ class daemon:
                 u.server = server
                 print("Connected to SMTP Server")
                 break
-            except ValueError:
+            except:
                 print("Could not connect to SMTP Server.")
                 print("Error. Reconfigure SMTP Entries.")
                 quit()
